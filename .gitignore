@@ -11,3 +11,6 @@ dist/
 # Environment files
 .env
 .env.local
+
+# Temp files
+tmp/
