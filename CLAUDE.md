@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Netlify Extension built with the Netlify SDK. It provides AI-powered form processing workflows configured through the Netlify UI.
+This is a Netlify Extension built with the Netlify SDK v2. It provides AI-powered form processing workflows configured through the Netlify UI.
 
 ## Commands
 
@@ -13,6 +13,33 @@ npm run dev          # Start extension UI dev server
 npm run build        # Build the extension
 npm run typecheck    # TypeScript type checking
 ```
+
+## SDK v2 Critical Requirements
+
+### Build Output Structure
+The SDK generates these files in `.ntli/site/static/` that MUST NOT be overwritten:
+- `manifest.json` - Contains `sdkVersion` that tells Netlify this is SDK v2
+- `details.md` - Extension documentation
+- `packages/buildhooks.tgz` - Build event handlers
+
+**Vite must output to `.ntli/site/static/ui/` subdirectory** to preserve these files.
+
+### React Version
+The SDK bundles React 18.x. DO NOT install React directly as a dependency:
+- Use `@types/react@18` and `@types/react-dom@18` as devDependencies only
+- Configure Vite aliases to use SDK's React from `node_modules/@netlify/sdk/node_modules/react`
+- Multiple React instances cause hooks errors ("can't access property useMemo")
+
+### Extension UI Structure
+- `index.html` at project ROOT (not in src/ui/)
+- Vite config with `base: '/ui/'` for correct asset paths
+- UI wrapped with `NetlifyExtensionUI` component from `@netlify/sdk/ui/react/components`
+- Surface routing via `SurfaceRouter` and `SurfaceRoute`
+
+### Key Config Files
+- `extension.yaml` - Must have `ui.surfaces` inside `config` block
+- `netlify.toml` - Must include `[[plugins]] package = "@netlify/netlify-plugin-netlify-extension"`
+- `vite.config.ts` - Must alias React and output to `/ui/` subdirectory
 
 ## Architecture
 

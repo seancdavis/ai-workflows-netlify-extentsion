@@ -58,6 +58,17 @@ npm install
 | `npm run build` | Build the extension |
 | `npm run typecheck` | Run TypeScript type checking |
 
+### SDK v2 Notes
+
+This extension uses Netlify SDK v2. Key requirements:
+
+- **React**: Do NOT install React directly. The SDK bundles React 18.x. Only install `@types/react@18` as devDependency.
+- **Vite Output**: Must output to `.ntli/site/static/ui/` to preserve SDK-generated `manifest.json`
+- **index.html**: Must be at project root, not in `src/ui/`
+- **Extension Registration**: Create via Team → Extensions → Create an extension (not the old integration flow)
+
+See `CLAUDE.md` for detailed technical requirements.
+
 ### Testing Locally
 
 1. Deploy and publish extension as private to your team (one-time)
