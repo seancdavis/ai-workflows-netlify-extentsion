@@ -1,5 +1,5 @@
 config:
-  slug: ai-workflows
+  slug: 0-19k8k9-ai-workflows
   name: AI Workflows
   description: Configure AI-powered workflows for form submissions without writing code
   scopes:
