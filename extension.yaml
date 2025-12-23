@@ -1,0 +1,14 @@
+name: AI Workflows
+slug: ai-workflows
+description: Configure AI-powered workflows for form submissions without writing code
+config:
+  build:
+    command: npm run build
+    publish: dist
+ui:
+  surfaces:
+    - extension-top-level-site-configuration
+scopes:
+  - site:read
+  - site:write
+  - env:read
