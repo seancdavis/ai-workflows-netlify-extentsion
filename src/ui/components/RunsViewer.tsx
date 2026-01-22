@@ -106,7 +106,7 @@ export function RunsViewer({ workflow, onBack }: RunsViewerProps) {
             style={{
               padding: '0.25rem 0.5rem',
               borderRadius: '4px',
-              border: '1px solid var(--colorGrayLight)',
+              border: '1px solid var(--colorGray)',
               backgroundColor: 'var(--colorBgApp)',
               color: 'var(--colorText)',
             }}
