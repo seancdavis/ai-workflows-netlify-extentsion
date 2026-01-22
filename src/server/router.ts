@@ -159,11 +159,25 @@ export const appRouter = router({
         throw new Error('Failed to fetch providers');
       }
       const data = await response.json();
-      return data as Array<{
-        id: string;
-        name: string;
+
+      // API returns { providers: { anthropic: {...}, openai: {...}, ... } }
+      // Transform to array format: [{ id, name, models: [...] }]
+      const providersObj = data.providers as Record<string, {
         models: Array<{ id: string; name: string }>;
       }>;
+
+      const providerNames: Record<string, string> = {
+        anthropic: 'Anthropic',
+        openai: 'OpenAI',
+        gemini: 'Google',
+        google: 'Google',
+      };
+
+      return Object.entries(providersObj).map(([id, provider]) => ({
+        id,
+        name: providerNames[id] || id,
+        models: provider.models || [],
+      }));
     } catch (error) {
       console.error('Failed to list providers:', error);
       // Return default providers as fallback
