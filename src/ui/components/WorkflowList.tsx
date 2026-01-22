@@ -19,7 +19,7 @@ export function WorkflowList({ onEdit, onViewRuns }: WorkflowListProps) {
 
   if (!workflows || workflows.length === 0) {
     return (
-      <div style={{ padding: '1rem', textAlign: 'center', color: '#666' }}>
+      <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--colorTextMuted)' }}>
         No workflows configured yet. Create one to get started.
       </div>
     );
@@ -46,17 +46,17 @@ export function WorkflowList({ onEdit, onViewRuns }: WorkflowListProps) {
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: '0.75rem',
-            border: '1px solid #e0e0e0',
+            border: '1px solid var(--colorGrayLighter)',
             borderRadius: '4px',
-            backgroundColor: '#fafafa',
+            backgroundColor: 'var(--colorBg)',
           }}
         >
           <div>
             <div style={{ fontWeight: 500 }}>{workflow.name}</div>
-            <div style={{ fontSize: '0.875rem', color: '#666' }}>
+            <div style={{ fontSize: '0.875rem', color: 'var(--colorTextMuted)' }}>
               {workflow.provider} / {workflow.model}
             </div>
-            <code style={{ fontSize: '0.75rem', color: '#888' }}>
+            <code style={{ fontSize: '0.75rem', color: 'var(--colorTextMuted)' }}>
               /_aiwf/{workflow.id}
             </code>
           </div>

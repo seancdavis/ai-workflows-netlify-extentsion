@@ -40,15 +40,15 @@ export function RunsViewer({ workflow, onBack }: RunsViewerProps) {
   const getStatusColor = (status: WorkflowRun['status']) => {
     switch (status) {
       case 'queued':
-        return '#888';
+        return 'var(--colorGrayDark)';
       case 'processing':
-        return '#0066cc';
+        return 'var(--colorBlueDarker)';
       case 'success':
-        return '#00a651';
+        return 'var(--colorGreenDarker)';
       case 'error':
-        return '#cc0000';
+        return 'var(--colorRedDarker)';
       default:
-        return '#888';
+        return 'var(--colorGrayDark)';
     }
   };
 
@@ -106,7 +106,9 @@ export function RunsViewer({ workflow, onBack }: RunsViewerProps) {
             style={{
               padding: '0.25rem 0.5rem',
               borderRadius: '4px',
-              border: '1px solid #ccc',
+              border: '1px solid var(--colorGrayLight)',
+              backgroundColor: 'var(--colorBgApp)',
+              color: 'var(--colorText)',
             }}
           >
             <option value="all">All</option>
@@ -122,7 +124,7 @@ export function RunsViewer({ workflow, onBack }: RunsViewerProps) {
       </div>
 
       {selectedRun ? (
-        <div style={{ border: '1px solid #e0e0e0', borderRadius: '4px', padding: '1rem' }}>
+        <div style={{ border: '1px solid var(--colorGrayLighter)', borderRadius: '4px', padding: '1rem' }}>
           <div
             style={{
               display: 'flex',
@@ -149,10 +151,10 @@ export function RunsViewer({ workflow, onBack }: RunsViewerProps) {
           </div>
 
           <div style={{ marginBottom: '1rem' }}>
-            <div style={{ fontSize: '0.75rem', color: '#666', marginBottom: '0.25rem' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--colorTextMuted)', marginBottom: '0.25rem' }}>
               ID: {selectedRun.id}
             </div>
-            <div style={{ fontSize: '0.75rem', color: '#666' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--colorTextMuted)' }}>
               Created: {new Date(selectedRun.createdAt).toLocaleString()}
               {selectedRun.completedAt && (
                 <> | Completed: {new Date(selectedRun.completedAt).toLocaleString()}</>
@@ -167,12 +169,13 @@ export function RunsViewer({ workflow, onBack }: RunsViewerProps) {
             <div style={{ fontWeight: 500, marginBottom: '0.5rem' }}>Input:</div>
             <pre
               style={{
-                backgroundColor: '#f5f5f5',
+                backgroundColor: 'var(--colorBg)',
                 padding: '0.75rem',
                 borderRadius: '4px',
                 fontSize: '0.75rem',
                 overflow: 'auto',
                 maxHeight: '150px',
+                color: 'var(--colorText)',
               }}
             >
               {JSON.stringify(selectedRun.input, null, 2)}
@@ -184,12 +187,13 @@ export function RunsViewer({ workflow, onBack }: RunsViewerProps) {
               <div style={{ fontWeight: 500, marginBottom: '0.5rem' }}>Output:</div>
               <pre
                 style={{
-                  backgroundColor: '#e8f5e9',
+                  backgroundColor: 'var(--colorGreenLightest)',
                   padding: '0.75rem',
                   borderRadius: '4px',
                   fontSize: '0.75rem',
                   overflow: 'auto',
                   maxHeight: '200px',
+                  color: 'var(--colorText)',
                 }}
               >
                 {JSON.stringify(selectedRun.output, null, 2)}
@@ -199,17 +203,17 @@ export function RunsViewer({ workflow, onBack }: RunsViewerProps) {
 
           {selectedRun.error && (
             <div style={{ marginBottom: '1rem' }}>
-              <div style={{ fontWeight: 500, marginBottom: '0.5rem', color: '#cc0000' }}>
+              <div style={{ fontWeight: 500, marginBottom: '0.5rem', color: 'var(--colorRedDarker)' }}>
                 Error:
               </div>
               <pre
                 style={{
-                  backgroundColor: '#ffebee',
+                  backgroundColor: 'var(--colorRedLightest)',
                   padding: '0.75rem',
                   borderRadius: '4px',
                   fontSize: '0.75rem',
                   overflow: 'auto',
-                  color: '#cc0000',
+                  color: 'var(--colorRedDarker)',
                 }}
               >
                 {selectedRun.error}
@@ -220,9 +224,9 @@ export function RunsViewer({ workflow, onBack }: RunsViewerProps) {
       ) : (
         <>
           {!runs || runs.length === 0 ? (
-            <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
+            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--colorTextMuted)' }}>
               No runs yet. Submit a form to{' '}
-              <code style={{ backgroundColor: '#f0f0f0', padding: '0.125rem 0.25rem' }}>
+              <code style={{ backgroundColor: 'var(--colorBg)', padding: '0.125rem 0.25rem' }}>
                 /_aiwf/{workflow.id}
               </code>{' '}
               to see results here.
@@ -238,23 +242,23 @@ export function RunsViewer({ workflow, onBack }: RunsViewerProps) {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '0.75rem',
-                    border: '1px solid #e0e0e0',
+                    border: '1px solid var(--colorGrayLighter)',
                     borderRadius: '4px',
                     cursor: 'pointer',
-                    backgroundColor: '#fafafa',
+                    backgroundColor: 'var(--colorBg)',
                   }}
                 >
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       {getStatusBadge(run.status)}
-                      <span style={{ fontSize: '0.875rem', color: '#666' }}>
+                      <span style={{ fontSize: '0.875rem', color: 'var(--colorTextMuted)' }}>
                         {new Date(run.createdAt).toLocaleString()}
                       </span>
                     </div>
                     <div
                       style={{
                         fontSize: '0.75rem',
-                        color: '#888',
+                        color: 'var(--colorTextMuted)',
                         marginTop: '0.25rem',
                       }}
                     >

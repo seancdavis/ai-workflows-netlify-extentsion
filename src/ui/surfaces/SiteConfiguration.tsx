@@ -49,7 +49,7 @@ export function SiteConfiguration() {
         <CardTitle>AI Workflows</CardTitle>
         {view === 'list' && (
           <>
-            <p style={{ marginBottom: '1rem', color: '#666' }}>
+            <p style={{ marginBottom: '1rem', color: 'var(--colorTextMuted)' }}>
               Configure AI-powered workflows for your form submissions. Each workflow
               processes form data through an AI model and saves structured output.
             </p>

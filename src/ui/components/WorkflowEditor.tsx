@@ -114,23 +114,29 @@ export function WorkflowEditor({ workflow, onSaved, onCancel }: WorkflowEditorPr
     }
   };
 
-  const labelStyle = {
+  const labelStyle: React.CSSProperties = {
     display: 'block',
     marginBottom: '0.25rem',
     fontWeight: 500,
     fontSize: '0.875rem',
   };
 
-  const inputStyle = {
+  const inputStyle: React.CSSProperties = {
     width: '100%',
     padding: '0.5rem',
-    border: '1px solid #ccc',
+    border: '1px solid var(--colorGrayLight)',
     borderRadius: '4px',
     fontSize: '0.875rem',
+    backgroundColor: 'var(--colorBgApp)',
+    color: 'var(--colorText)',
   };
 
-  const fieldGroupStyle = {
+  const fieldGroupStyle: React.CSSProperties = {
     marginBottom: '1rem',
+  };
+
+  const hintStyle: React.CSSProperties = {
+    color: 'var(--colorTextMuted)',
   };
 
   return (
@@ -175,7 +181,7 @@ export function WorkflowEditor({ workflow, onSaved, onCancel }: WorkflowEditorPr
             style={inputStyle}
           />
         )}
-        <small style={{ color: '#666' }}>
+        <small style={hintStyle}>
           Reference name for this workflow (doesn't affect functionality)
         </small>
       </div>
@@ -190,7 +196,7 @@ export function WorkflowEditor({ workflow, onSaved, onCancel }: WorkflowEditorPr
           required
           style={inputStyle}
         />
-        <small style={{ color: '#666' }}>
+        <small style={hintStyle}>
           Comma-separated list of expected form field names
         </small>
       </div>
@@ -205,14 +211,14 @@ export function WorkflowEditor({ workflow, onSaved, onCancel }: WorkflowEditorPr
           rows={4}
           style={{ ...inputStyle, resize: 'vertical' }}
         />
-        <small style={{ color: '#666' }}>
+        <small style={hintStyle}>
           Use {'{{fieldName}}'} to reference form fields (e.g., {'{{name}}'}, {'{{email}}'})
         </small>
       </div>
 
       <div style={fieldGroupStyle}>
         <label style={labelStyle}>Output Schema</label>
-        <small style={{ color: '#666', display: 'block', marginBottom: '0.5rem' }}>
+        <small style={{ ...hintStyle, display: 'block', marginBottom: '0.5rem' }}>
           Define the fields the AI should output
         </small>
         {outputFields.map((field, index) => (
@@ -302,7 +308,7 @@ export function WorkflowEditor({ workflow, onSaved, onCancel }: WorkflowEditorPr
           placeholder="https://example.com/thank-you"
           style={inputStyle}
         />
-        <small style={{ color: '#666' }}>
+        <small style={hintStyle}>
           Where to redirect after form submission. If empty, returns JSON response.
         </small>
       </div>
@@ -317,7 +323,7 @@ export function WorkflowEditor({ workflow, onSaved, onCancel }: WorkflowEditorPr
       </div>
 
       {(createWorkflow.error || updateWorkflow.error) && (
-        <div style={{ color: 'red', marginTop: '1rem' }}>
+        <div style={{ color: 'var(--colorRedDarker)', marginTop: '1rem' }}>
           Error: {createWorkflow.error?.message || updateWorkflow.error?.message}
         </div>
       )}
