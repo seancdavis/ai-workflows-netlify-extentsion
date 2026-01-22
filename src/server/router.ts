@@ -160,10 +160,10 @@ export const appRouter = router({
       }
       const data = await response.json();
 
-      // API returns { providers: { anthropic: {...}, openai: {...}, ... } }
-      // Transform to array format: [{ id, name, models: [...] }]
+      // API returns { providers: { anthropic: { models: ["model-id", ...] }, ... } }
+      // Transform to array format: [{ id, name, models: [{ id, name }, ...] }]
       const providersObj = data.providers as Record<string, {
-        models: Array<{ id: string; name: string }>;
+        models: string[];
       }>;
 
       const providerNames: Record<string, string> = {
@@ -176,7 +176,10 @@ export const appRouter = router({
       return Object.entries(providersObj).map(([id, provider]) => ({
         id,
         name: providerNames[id] || id,
-        models: provider.models || [],
+        models: (provider.models || []).map((modelId) => ({
+          id: modelId,
+          name: modelId,
+        })),
       }));
     } catch (error) {
       console.error('Failed to list providers:', error);
