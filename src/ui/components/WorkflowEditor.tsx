@@ -124,7 +124,7 @@ export function WorkflowEditor({ workflow, onSaved, onCancel }: WorkflowEditorPr
   const inputStyle: React.CSSProperties = {
     width: '100%',
     padding: '0.5rem',
-    border: '1px solid var(--colorGrayLight)',
+    border: '1px solid rgb(126 135 146)',
     borderRadius: '4px',
     fontSize: '0.875rem',
     backgroundColor: 'var(--colorBgApp)',
