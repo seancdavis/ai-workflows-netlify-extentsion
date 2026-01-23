@@ -25,52 +25,21 @@ const workflowInputSchema = z.object({
   redirectUrl: z.string().url().optional().or(z.literal('')),
 });
 
-// Helper to get blob context from tRPC context
-// Returns undefined if either siteId or token is missing
-function getBlobContext(ctx: { siteId: string | null; auth: { netlifyToken: string | null } }) {
-  if (!ctx.siteId || !ctx.auth.netlifyToken) {
-    console.log('getBlobContext: missing siteId or token', {
-      hasSiteId: !!ctx.siteId,
-      hasToken: !!ctx.auth.netlifyToken
-    });
-    return undefined;
-  }
-  return { siteId: ctx.siteId, token: ctx.auth.netlifyToken };
-}
-
 export const appRouter = router({
   // Workflows
   listWorkflows: publicProcedure.query(async ({ ctx }) => {
-    const blobCtx = getBlobContext(ctx);
-    if (!blobCtx) {
-      console.error('listWorkflows: No blob context available');
-      return [];
-    }
-    try {
-      return await listWorkflowConfigs(blobCtx);
-    } catch (error) {
-      console.error('listWorkflows error:', error);
-      throw new Error(`Failed to list workflows: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
+    return listWorkflowConfigs(ctx.siteId ?? undefined);
   }),
 
   getWorkflow: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const blobCtx = getBlobContext(ctx);
-      if (!blobCtx) {
-        return null;
-      }
-      return getWorkflowConfig(input.id, blobCtx);
+      return getWorkflowConfig(input.id, ctx.siteId ?? undefined);
     }),
 
   createWorkflow: publicProcedure
     .input(workflowInputSchema)
     .mutation(async ({ input, ctx }) => {
-      const blobCtx = getBlobContext(ctx);
-      if (!blobCtx) {
-        throw new Error('Cannot create workflow: missing site context');
-      }
       const now = new Date().toISOString();
       const config: WorkflowConfig = {
         id: uuid(),
@@ -85,23 +54,14 @@ export const appRouter = router({
         createdAt: now,
         updatedAt: now,
       };
-      try {
-        await setWorkflowConfig(config, blobCtx);
-      } catch (error) {
-        console.error('createWorkflow error:', error);
-        throw new Error(`Failed to save workflow: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      }
+      await setWorkflowConfig(config, ctx.siteId ?? undefined);
       return config;
     }),
 
   updateWorkflow: publicProcedure
     .input(z.object({ id: z.string() }).merge(workflowInputSchema))
     .mutation(async ({ input, ctx }) => {
-      const blobCtx = getBlobContext(ctx);
-      if (!blobCtx) {
-        throw new Error('Cannot update workflow: missing site context');
-      }
-      const existing = await getWorkflowConfig(input.id, blobCtx);
+      const existing = await getWorkflowConfig(input.id, ctx.siteId ?? undefined);
       if (!existing) {
         throw new Error('Workflow not found');
       }
@@ -117,18 +77,14 @@ export const appRouter = router({
         redirectUrl: input.redirectUrl || undefined,
         updatedAt: new Date().toISOString(),
       };
-      await setWorkflowConfig(config, blobCtx);
+      await setWorkflowConfig(config, ctx.siteId ?? undefined);
       return config;
     }),
 
   deleteWorkflow: publicProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const blobCtx = getBlobContext(ctx);
-      if (!blobCtx) {
-        throw new Error('Cannot delete workflow: missing site context');
-      }
-      await deleteWorkflowConfig(input.id, blobCtx);
+      await deleteWorkflowConfig(input.id, ctx.siteId ?? undefined);
       return { success: true };
     }),
 
@@ -139,31 +95,19 @@ export const appRouter = router({
       status: z.enum(['queued', 'processing', 'success', 'error']).optional(),
     }))
     .query(async ({ input, ctx }) => {
-      const blobCtx = getBlobContext(ctx);
-      if (!blobCtx) {
-        return [];
-      }
-      return listWorkflowRuns(input.workflowId, input.status, blobCtx);
+      return listWorkflowRuns(input.workflowId, input.status, ctx.siteId ?? undefined);
     }),
 
   getRun: publicProcedure
     .input(z.object({ workflowId: z.string(), runId: z.string() }))
     .query(async ({ input, ctx }) => {
-      const blobCtx = getBlobContext(ctx);
-      if (!blobCtx) {
-        return null;
-      }
-      return getWorkflowRun(input.workflowId, input.runId, blobCtx);
+      return getWorkflowRun(input.workflowId, input.runId, ctx.siteId ?? undefined);
     }),
 
   retryRun: publicProcedure
     .input(z.object({ workflowId: z.string(), runId: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const blobCtx = getBlobContext(ctx);
-      if (!blobCtx) {
-        throw new Error('Cannot retry run: missing site context');
-      }
-      const originalRun = await getWorkflowRun(input.workflowId, input.runId, blobCtx);
+      const originalRun = await getWorkflowRun(input.workflowId, input.runId, ctx.siteId ?? undefined);
       if (!originalRun) {
         throw new Error('Run not found');
       }
@@ -180,7 +124,7 @@ export const appRouter = router({
         retryCount: originalRun.retryCount + 1,
       };
 
-      await setWorkflowRun(newRun, blobCtx);
+      await setWorkflowRun(newRun, ctx.siteId ?? undefined);
 
       // Trigger background function
       // Note: In the actual extension context, we need to get the site URL

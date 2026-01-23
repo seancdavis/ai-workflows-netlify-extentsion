@@ -1,6 +1,25 @@
 import type { Context } from '@netlify/functions';
-import { getWorkflowConfig, getWorkflowRun, setWorkflowRun } from '../lib/blob-stores.js';
+import { getWorkflowRun, setWorkflowRun } from '../lib/blob-stores.js';
 import { callAI } from '../lib/ai-client.js';
+import type { WorkflowConfig } from '../lib/types.js';
+
+// Extension site URL - this is where workflow configs are stored
+const EXTENSION_URL = process.env.AIWF_EXTENSION_URL || 'https://0-19k8k9-ai-workflows.netlify.app';
+
+async function fetchWorkflowConfig(workflowId: string, siteId: string): Promise<WorkflowConfig | null> {
+  try {
+    const url = `${EXTENSION_URL}/.netlify/functions/get-workflow?siteId=${siteId}&workflowId=${workflowId}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error('Failed to fetch workflow config:', response.status, await response.text());
+      return null;
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching workflow config:', error);
+    return null;
+  }
+}
 
 interface RequestBody {
   runId: string;
@@ -34,9 +53,19 @@ export default async function handler(req: Request, _context: Context) {
     });
   }
 
-  // Fetch workflow config and run
+  // Get site ID from environment
+  const siteId = process.env.SITE_ID;
+  if (!siteId) {
+    console.error('Site ID not available');
+    return new Response(JSON.stringify({ error: 'Site ID not available' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  // Fetch workflow config from extension and run from local store
   const [config, run] = await Promise.all([
-    getWorkflowConfig(workflowId),
+    fetchWorkflowConfig(workflowId, siteId),
     getWorkflowRun(workflowId, runId),
   ]);
 
