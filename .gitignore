@@ -1,16 +1,2 @@
-# Dependencies
-node_modules/
-
-# Build output
-dist/
-.ntli/
-
-# Local Netlify folder
-.netlify/
-
-# Environment files
-.env
-.env.local
-
-# Temp files
-tmp/
+node_modules
+.DS_Store
