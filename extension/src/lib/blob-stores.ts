@@ -3,31 +3,31 @@ import type { WorkflowConfig, WorkflowRun } from './types.js';
 
 const CONFIGS_STORE = 'aiwf-configs';
 
-export function getConfigsStore() {
-  return getStore(CONFIGS_STORE);
+export function getConfigsStore(siteId?: string) {
+  return getStore({ name: CONFIGS_STORE, siteID: siteId });
 }
 
-export function getRunsStore(workflowId: string) {
-  return getStore(`aiwf-runs-${workflowId}`);
+export function getRunsStore(workflowId: string, siteId?: string) {
+  return getStore({ name: `aiwf-runs-${workflowId}`, siteID: siteId });
 }
 
-export async function getWorkflowConfig(id: string): Promise<WorkflowConfig | null> {
-  const store = getConfigsStore();
+export async function getWorkflowConfig(id: string, siteId?: string): Promise<WorkflowConfig | null> {
+  const store = getConfigsStore(siteId);
   return store.get(id, { type: 'json' });
 }
 
-export async function setWorkflowConfig(config: WorkflowConfig): Promise<void> {
-  const store = getConfigsStore();
+export async function setWorkflowConfig(config: WorkflowConfig, siteId?: string): Promise<void> {
+  const store = getConfigsStore(siteId);
   await store.setJSON(config.id, config);
 }
 
-export async function deleteWorkflowConfig(id: string): Promise<void> {
-  const store = getConfigsStore();
+export async function deleteWorkflowConfig(id: string, siteId?: string): Promise<void> {
+  const store = getConfigsStore(siteId);
   await store.delete(id);
 }
 
-export async function listWorkflowConfigs(): Promise<WorkflowConfig[]> {
-  const store = getConfigsStore();
+export async function listWorkflowConfigs(siteId?: string): Promise<WorkflowConfig[]> {
+  const store = getConfigsStore(siteId);
   const { blobs } = await store.list();
   const configs: WorkflowConfig[] = [];
 
@@ -43,21 +43,22 @@ export async function listWorkflowConfigs(): Promise<WorkflowConfig[]> {
   );
 }
 
-export async function getWorkflowRun(workflowId: string, runId: string): Promise<WorkflowRun | null> {
-  const store = getRunsStore(workflowId);
+export async function getWorkflowRun(workflowId: string, runId: string, siteId?: string): Promise<WorkflowRun | null> {
+  const store = getRunsStore(workflowId, siteId);
   return store.get(runId, { type: 'json' });
 }
 
-export async function setWorkflowRun(run: WorkflowRun): Promise<void> {
-  const store = getRunsStore(run.workflowId);
+export async function setWorkflowRun(run: WorkflowRun, siteId?: string): Promise<void> {
+  const store = getRunsStore(run.workflowId, siteId);
   await store.setJSON(run.id, run);
 }
 
 export async function listWorkflowRuns(
   workflowId: string,
-  status?: WorkflowRun['status']
+  status?: WorkflowRun['status'],
+  siteId?: string
 ): Promise<WorkflowRun[]> {
-  const store = getRunsStore(workflowId);
+  const store = getRunsStore(workflowId, siteId);
   const { blobs } = await store.list();
   const runs: WorkflowRun[] = [];
 

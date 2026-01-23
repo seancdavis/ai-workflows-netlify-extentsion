@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@netlify/sdk/ui/react/components';
 import { trpc } from '../trpc.js';
 import type { WorkflowConfig } from '../../lib/types.js';
@@ -8,9 +9,14 @@ interface WorkflowListProps {
 }
 
 export function WorkflowList({ onEdit, onViewRuns }: WorkflowListProps) {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const { data: workflows, isLoading, refetch } = trpc.listWorkflows.useQuery();
   const deleteWorkflow = trpc.deleteWorkflow.useMutation({
-    onSuccess: () => refetch(),
+    onSuccess: () => {
+      refetch();
+      setDeleteConfirmId(null);
+    },
   });
 
   if (isLoading) {
@@ -25,15 +31,29 @@ export function WorkflowList({ onEdit, onViewRuns }: WorkflowListProps) {
     );
   }
 
-  const copyUrl = (id: string) => {
+  const copyUrl = async (id: string) => {
     const url = `/_aiwf/${id}`;
-    navigator.clipboard.writeText(url);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      // Fallback for restricted contexts
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    }
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this workflow?')) {
-      await deleteWorkflow.mutateAsync({ id });
-    }
+    await deleteWorkflow.mutateAsync({ id });
   };
 
   return (
@@ -62,7 +82,7 @@ export function WorkflowList({ onEdit, onViewRuns }: WorkflowListProps) {
           </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <Button onClick={() => copyUrl(workflow.id)}>
-              Copy URL
+              {copiedId === workflow.id ? 'Copied!' : 'Copy URL'}
             </Button>
             <Button onClick={() => onViewRuns(workflow)}>
               Runs
@@ -70,13 +90,23 @@ export function WorkflowList({ onEdit, onViewRuns }: WorkflowListProps) {
             <Button onClick={() => onEdit(workflow)}>
               Edit
             </Button>
-            <Button
-              variant="danger"
-              onClick={() => handleDelete(workflow.id)}
-              disabled={deleteWorkflow.isPending}
-            >
-              Delete
-            </Button>
+            {deleteConfirmId === workflow.id ? (
+              <>
+                <Button
+                  onClick={() => handleDelete(workflow.id)}
+                  disabled={deleteWorkflow.isPending}
+                >
+                  {deleteWorkflow.isPending ? 'Deleting...' : 'Confirm'}
+                </Button>
+                <Button onClick={() => setDeleteConfirmId(null)}>
+                  Cancel
+                </Button>
+              </>
+            ) : (
+              <Button onClick={() => setDeleteConfirmId(workflow.id)}>
+                Delete
+              </Button>
+            )}
           </div>
         </div>
       ))}

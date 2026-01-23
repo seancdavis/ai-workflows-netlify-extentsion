@@ -27,19 +27,19 @@ const workflowInputSchema = z.object({
 
 export const appRouter = router({
   // Workflows
-  listWorkflows: publicProcedure.query(async () => {
-    return listWorkflowConfigs();
+  listWorkflows: publicProcedure.query(async ({ ctx }) => {
+    return listWorkflowConfigs(ctx.siteId ?? undefined);
   }),
 
   getWorkflow: publicProcedure
     .input(z.object({ id: z.string() }))
-    .query(async ({ input }) => {
-      return getWorkflowConfig(input.id);
+    .query(async ({ input, ctx }) => {
+      return getWorkflowConfig(input.id, ctx.siteId ?? undefined);
     }),
 
   createWorkflow: publicProcedure
     .input(workflowInputSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const now = new Date().toISOString();
       const config: WorkflowConfig = {
         id: uuid(),
@@ -54,14 +54,14 @@ export const appRouter = router({
         createdAt: now,
         updatedAt: now,
       };
-      await setWorkflowConfig(config);
+      await setWorkflowConfig(config, ctx.siteId ?? undefined);
       return config;
     }),
 
   updateWorkflow: publicProcedure
     .input(z.object({ id: z.string() }).merge(workflowInputSchema))
-    .mutation(async ({ input }) => {
-      const existing = await getWorkflowConfig(input.id);
+    .mutation(async ({ input, ctx }) => {
+      const existing = await getWorkflowConfig(input.id, ctx.siteId ?? undefined);
       if (!existing) {
         throw new Error('Workflow not found');
       }
@@ -77,14 +77,14 @@ export const appRouter = router({
         redirectUrl: input.redirectUrl || undefined,
         updatedAt: new Date().toISOString(),
       };
-      await setWorkflowConfig(config);
+      await setWorkflowConfig(config, ctx.siteId ?? undefined);
       return config;
     }),
 
   deleteWorkflow: publicProcedure
     .input(z.object({ id: z.string() }))
-    .mutation(async ({ input }) => {
-      await deleteWorkflowConfig(input.id);
+    .mutation(async ({ input, ctx }) => {
+      await deleteWorkflowConfig(input.id, ctx.siteId ?? undefined);
       return { success: true };
     }),
 
@@ -94,20 +94,20 @@ export const appRouter = router({
       workflowId: z.string(),
       status: z.enum(['queued', 'processing', 'success', 'error']).optional(),
     }))
-    .query(async ({ input }) => {
-      return listWorkflowRuns(input.workflowId, input.status);
+    .query(async ({ input, ctx }) => {
+      return listWorkflowRuns(input.workflowId, input.status, ctx.siteId ?? undefined);
     }),
 
   getRun: publicProcedure
     .input(z.object({ workflowId: z.string(), runId: z.string() }))
-    .query(async ({ input }) => {
-      return getWorkflowRun(input.workflowId, input.runId);
+    .query(async ({ input, ctx }) => {
+      return getWorkflowRun(input.workflowId, input.runId, ctx.siteId ?? undefined);
     }),
 
   retryRun: publicProcedure
     .input(z.object({ workflowId: z.string(), runId: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const originalRun = await getWorkflowRun(input.workflowId, input.runId);
+      const originalRun = await getWorkflowRun(input.workflowId, input.runId, ctx.siteId ?? undefined);
       if (!originalRun) {
         throw new Error('Run not found');
       }
@@ -124,7 +124,7 @@ export const appRouter = router({
         retryCount: originalRun.retryCount + 1,
       };
 
-      await setWorkflowRun(newRun);
+      await setWorkflowRun(newRun, ctx.siteId ?? undefined);
 
       // Trigger background function
       // Note: In the actual extension context, we need to get the site URL
