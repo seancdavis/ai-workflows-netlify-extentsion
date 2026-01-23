@@ -4,7 +4,7 @@ import { setWorkflowRun } from '../lib/blob-stores.js';
 import type { WorkflowConfig, WorkflowRun } from '../lib/types.js';
 
 // Extension site URL - this is where workflow configs are stored
-const EXTENSION_URL = process.env.AIWF_EXTENSION_URL || 'https://0-19k8k9-ai-workflows.netlify.app';
+const EXTENSION_URL = process.env.AIWF_EXTENSION_URL || 'https://ai-workflows.netlify.app';
 
 async function fetchWorkflowConfig(workflowId: string, siteId: string): Promise<WorkflowConfig | null> {
   try {
