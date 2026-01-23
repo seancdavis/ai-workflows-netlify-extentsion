@@ -95,6 +95,7 @@ export function WorkflowList({ onEdit, onViewRuns }: WorkflowListProps) {
                 <Button
                   onClick={() => handleDelete(workflow.id)}
                   disabled={deleteWorkflow.isPending}
+                  style={{ backgroundColor: '#dc2626', borderColor: '#dc2626', color: 'white' }}
                 >
                   {deleteWorkflow.isPending ? 'Deleting...' : 'Confirm'}
                 </Button>
@@ -103,7 +104,10 @@ export function WorkflowList({ onEdit, onViewRuns }: WorkflowListProps) {
                 </Button>
               </>
             ) : (
-              <Button onClick={() => setDeleteConfirmId(workflow.id)}>
+              <Button
+                onClick={() => setDeleteConfirmId(workflow.id)}
+                style={{ backgroundColor: '#dc2626', borderColor: '#dc2626', color: 'white' }}
+              >
                 Delete
               </Button>
             )}
