@@ -3,49 +3,49 @@ import type { WorkflowConfig, WorkflowRun } from './types.js';
 
 const CONFIGS_STORE = 'aiwf-configs';
 
-// Site ID is used to namespace blobs within the store
-// This allows site-specific data while storing on the extension's site
-export function getConfigsStore() {
+interface BlobContext {
+  siteId: string;
+  token: string;
+}
+
+// Get store for a specific site (used by extension UI)
+// When context is provided, accesses the target site's blob store
+// When not provided (injected functions), uses auto-detected context
+export function getConfigsStore(ctx?: BlobContext) {
+  if (ctx) {
+    return getStore({ name: CONFIGS_STORE, siteID: ctx.siteId, token: ctx.token });
+  }
   return getStore(CONFIGS_STORE);
 }
 
-export function getRunsStore(workflowId: string) {
+export function getRunsStore(workflowId: string, ctx?: BlobContext) {
+  if (ctx) {
+    return getStore({ name: `aiwf-runs-${workflowId}`, siteID: ctx.siteId, token: ctx.token });
+  }
   return getStore(`aiwf-runs-${workflowId}`);
 }
 
-// Helper to create site-namespaced keys
-function siteKey(siteId: string | undefined, key: string): string {
-  return siteId ? `${siteId}:${key}` : key;
+export async function getWorkflowConfig(id: string, ctx?: BlobContext): Promise<WorkflowConfig | null> {
+  const store = getConfigsStore(ctx);
+  return store.get(id, { type: 'json' });
 }
 
-export async function getWorkflowConfig(id: string, siteId?: string): Promise<WorkflowConfig | null> {
-  const store = getConfigsStore();
-  return store.get(siteKey(siteId, id), { type: 'json' });
+export async function setWorkflowConfig(config: WorkflowConfig, ctx?: BlobContext): Promise<void> {
+  const store = getConfigsStore(ctx);
+  await store.setJSON(config.id, config);
 }
 
-export async function setWorkflowConfig(config: WorkflowConfig, siteId?: string): Promise<void> {
-  const store = getConfigsStore();
-  await store.setJSON(siteKey(siteId, config.id), config);
+export async function deleteWorkflowConfig(id: string, ctx?: BlobContext): Promise<void> {
+  const store = getConfigsStore(ctx);
+  await store.delete(id);
 }
 
-export async function deleteWorkflowConfig(id: string, siteId?: string): Promise<void> {
-  const store = getConfigsStore();
-  await store.delete(siteKey(siteId, id));
-}
-
-export async function listWorkflowConfigs(siteId?: string): Promise<WorkflowConfig[]> {
-  const store = getConfigsStore();
+export async function listWorkflowConfigs(ctx?: BlobContext): Promise<WorkflowConfig[]> {
+  const store = getConfigsStore(ctx);
   const { blobs } = await store.list();
   const configs: WorkflowConfig[] = [];
 
-  // Filter blobs by siteId prefix
-  const prefix = siteId ? `${siteId}:` : '';
-
   for (const blob of blobs) {
-    // Only include blobs that match the site prefix
-    if (siteId && !blob.key.startsWith(prefix)) {
-      continue;
-    }
     const config = await store.get(blob.key, { type: 'json' }) as WorkflowConfig | null;
     if (config) {
       configs.push(config);
@@ -57,22 +57,22 @@ export async function listWorkflowConfigs(siteId?: string): Promise<WorkflowConf
   );
 }
 
-export async function getWorkflowRun(workflowId: string, runId: string, siteId?: string): Promise<WorkflowRun | null> {
-  const store = getRunsStore(siteKey(siteId, workflowId));
+export async function getWorkflowRun(workflowId: string, runId: string, ctx?: BlobContext): Promise<WorkflowRun | null> {
+  const store = getRunsStore(workflowId, ctx);
   return store.get(runId, { type: 'json' });
 }
 
-export async function setWorkflowRun(run: WorkflowRun, siteId?: string): Promise<void> {
-  const store = getRunsStore(siteKey(siteId, run.workflowId));
+export async function setWorkflowRun(run: WorkflowRun, ctx?: BlobContext): Promise<void> {
+  const store = getRunsStore(run.workflowId, ctx);
   await store.setJSON(run.id, run);
 }
 
 export async function listWorkflowRuns(
   workflowId: string,
   status?: WorkflowRun['status'],
-  siteId?: string
+  ctx?: BlobContext
 ): Promise<WorkflowRun[]> {
-  const store = getRunsStore(siteKey(siteId, workflowId));
+  const store = getRunsStore(workflowId, ctx);
   const { blobs } = await store.list();
   const runs: WorkflowRun[] = [];
 
