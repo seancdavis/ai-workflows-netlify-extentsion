@@ -1,6 +1,5 @@
 import type { Config, Context } from '@netlify/functions';
 import { v4 as uuid } from 'uuid';
-import { setWorkflowRun } from '../lib/blob-stores.js';
 import type { WorkflowConfig, WorkflowRun } from '../lib/types.js';
 
 // Extension site URL - this is where workflow configs are stored
@@ -18,6 +17,25 @@ async function fetchWorkflowConfig(workflowId: string, siteId: string): Promise<
   } catch (error) {
     console.error('Error fetching workflow config:', error);
     return null;
+  }
+}
+
+async function createRunOnExtension(run: WorkflowRun, siteId: string): Promise<boolean> {
+  try {
+    const url = `${EXTENSION_URL}/.netlify/functions/create-run`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ siteId, run }),
+    });
+    if (!response.ok) {
+      console.error('Failed to create run on extension:', response.status, await response.text());
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error('Error creating run on extension:', error);
+    return false;
   }
 }
 
@@ -141,7 +159,12 @@ export default async function handler(req: Request, context: Context) {
     retryCount: 0,
   };
 
-  await setWorkflowRun(run);
+  // Store run on extension site
+  const runCreated = await createRunOnExtension(run, siteId);
+  if (!runCreated) {
+    console.error('Failed to create run on extension site');
+    // Continue anyway - background function may still work and we don't want to block the user
+  }
 
   // Trigger background function
   const backgroundUrl = `${baseUrl}/.netlify/functions/aiwf_process-workflow-background`;

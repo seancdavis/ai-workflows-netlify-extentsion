@@ -45,21 +45,26 @@ The SDK bundles React 18.x. DO NOT install React directly as a dependency:
 
 ### Storage Architecture
 
-**Important**: Workflow configs are stored on the **extension's site**, not on user sites.
+**Important**: Both workflow configs AND run data are stored on the **extension's site**, not on user sites.
 
 ```
 Extension Site (ai-workflows.netlify.app)
 ├── Blob Store: aiwf-configs
-│   └── Keys: {siteId}:{workflowId}  (namespaced by user's site ID)
+│   └── Keys: {siteId}:{workflowId}  (workflow configs)
+├── Blob Store: aiwf-runs-{siteId}:{workflowId}
+│   └── Keys: {runId}  (run records per workflow)
 └── Endpoints:
     ├── /api/trpc/*  (UI uses this)
-    └── /.netlify/functions/get-workflow  (injected functions call this)
+    ├── /.netlify/functions/get-workflow  (injected functions fetch config)
+    ├── /.netlify/functions/get-run  (injected functions fetch run)
+    ├── /.netlify/functions/create-run  (injected functions create run)
+    └── /.netlify/functions/update-run  (injected functions update run status)
 
 User Site (where extension is installed)
 ├── Injected Functions:
 │   ├── /_aiwf/:id  (workflow-handler.ts)
 │   └── /.netlify/functions/aiwf_process-workflow-background
-└── Blob Store: aiwf-runs-{siteId}:{workflowId}  (run data stored locally)
+└── (no local storage - all data on extension site)
 ```
 
 ### Key Data Flow
@@ -67,8 +72,8 @@ User Site (where extension is installed)
 1. User creates workflow via UI → tRPC saves to extension's blob store with key `{siteId}:{workflowId}`
 2. Form submits to user site `/_aiwf/:id` → injected function fetches config from extension API
 3. If `formName` configured → form data submitted to Netlify Forms first
-4. Run record created → background function triggered
-5. Background function calls AI Gateway → result saved to user site's blob store
+4. Run record created on extension site via `create-run` endpoint → background function triggered
+5. Background function calls AI Gateway → result saved to extension site via `update-run` endpoint
 
 ### Function Injection
 
@@ -76,9 +81,12 @@ Functions in `src/functions/` are injected into user projects via `addFunctions(
 - `/_aiwf/:id` (custom path via config)
 - `/.netlify/functions/aiwf_process-workflow-background`
 
-Injected functions fetch workflow config from the extension via HTTP:
+Injected functions communicate with the extension via HTTP:
 ```
-GET https://ai-workflows.netlify.app/.netlify/functions/get-workflow?siteId={SITE_ID}&workflowId={id}
+GET  /.netlify/functions/get-workflow?siteId={SITE_ID}&workflowId={id}
+GET  /.netlify/functions/get-run?siteId={SITE_ID}&workflowId={id}&runId={runId}
+POST /.netlify/functions/create-run  (body: { siteId, run })
+POST /.netlify/functions/update-run  (body: { siteId, workflowId, runId, updates })
 ```
 
 The extension URL can be overridden with `AIWF_EXTENSION_URL` env var.
@@ -99,6 +107,9 @@ AI responses are parsed as JSON. Markdown code fences (```json) are automaticall
 | `src/lib/blob-stores.ts` | Netlify Blobs helpers with siteId key prefixing |
 | `src/lib/ai-client.ts` | AI provider API calls |
 | `src/endpoints/get-workflow.ts` | Public API for injected functions to fetch config |
+| `src/endpoints/get-run.ts` | Public API for injected functions to fetch run |
+| `src/endpoints/create-run.ts` | Public API for injected functions to create run |
+| `src/endpoints/update-run.ts` | Public API for injected functions to update run |
 | `src/functions/workflow-handler.ts` | Injected: handles form submissions |
 | `src/functions/process-workflow-background.ts` | Injected: processes AI calls |
 | `src/ui/surfaces/SiteConfiguration.tsx` | Main UI component |
@@ -118,7 +129,7 @@ This extension requires deployment to test fully:
 - ESM modules (`"type": "module"` in package.json)
 - File extensions required in imports (`.js` for TypeScript files)
 - tRPC for UI-to-backend communication
-- Netlify Blobs for persistent storage (extension site for configs, user site for runs)
+- Netlify Blobs for persistent storage (all data stored on extension site, namespaced by user siteId)
 
 ## Common Issues
 

@@ -1,7 +1,6 @@
 import type { Context } from '@netlify/functions';
-import { getWorkflowRun, setWorkflowRun } from '../lib/blob-stores.js';
 import { callAI } from '../lib/ai-client.js';
-import type { WorkflowConfig } from '../lib/types.js';
+import type { WorkflowConfig, WorkflowRun } from '../lib/types.js';
 
 // Extension site URL - this is where workflow configs are stored
 const EXTENSION_URL = process.env.AIWF_EXTENSION_URL || 'https://ai-workflows.netlify.app';
@@ -18,6 +17,49 @@ async function fetchWorkflowConfig(workflowId: string, siteId: string): Promise<
   } catch (error) {
     console.error('Error fetching workflow config:', error);
     return null;
+  }
+}
+
+async function fetchRunFromExtension(
+  workflowId: string,
+  runId: string,
+  siteId: string
+): Promise<WorkflowRun | null> {
+  try {
+    const url = `${EXTENSION_URL}/.netlify/functions/get-run?siteId=${siteId}&workflowId=${workflowId}&runId=${runId}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error('Failed to fetch run from extension:', response.status, await response.text());
+      return null;
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching run from extension:', error);
+    return null;
+  }
+}
+
+async function updateRunOnExtension(
+  workflowId: string,
+  runId: string,
+  updates: Partial<WorkflowRun>,
+  siteId: string
+): Promise<boolean> {
+  try {
+    const url = `${EXTENSION_URL}/.netlify/functions/update-run`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ siteId, workflowId, runId, updates }),
+    });
+    if (!response.ok) {
+      console.error('Failed to update run on extension:', response.status, await response.text());
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error('Error updating run on extension:', error);
+    return false;
   }
 }
 
@@ -63,10 +105,10 @@ export default async function handler(req: Request, _context: Context) {
     });
   }
 
-  // Fetch workflow config from extension and run from local store
+  // Fetch workflow config and run from extension site
   const [config, run] = await Promise.all([
     fetchWorkflowConfig(workflowId, siteId),
-    getWorkflowRun(workflowId, runId),
+    fetchRunFromExtension(workflowId, runId, siteId),
   ]);
 
   if (!config) {
@@ -86,27 +128,30 @@ export default async function handler(req: Request, _context: Context) {
   }
 
   // Update run status to processing
-  run.status = 'processing';
-  run.startedAt = new Date().toISOString();
-  await setWorkflowRun(run);
+  await updateRunOnExtension(workflowId, runId, {
+    status: 'processing',
+    startedAt: new Date().toISOString(),
+  }, siteId);
 
   try {
     // Call AI
     const output = await callAI(config, run.input);
 
     // Update run with success
-    run.status = 'success';
-    run.output = output;
-    run.completedAt = new Date().toISOString();
-    await setWorkflowRun(run);
+    await updateRunOnExtension(workflowId, runId, {
+      status: 'success',
+      output,
+      completedAt: new Date().toISOString(),
+    }, siteId);
 
     console.log(`Run ${runId} completed successfully`);
   } catch (error) {
     // Update run with error
-    run.status = 'error';
-    run.error = error instanceof Error ? error.message : 'Unknown error';
-    run.completedAt = new Date().toISOString();
-    await setWorkflowRun(run);
+    await updateRunOnExtension(workflowId, runId, {
+      status: 'error',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      completedAt: new Date().toISOString(),
+    }, siteId);
 
     console.error(`Run ${runId} failed:`, error);
   }
