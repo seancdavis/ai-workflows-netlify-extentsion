@@ -20,19 +20,29 @@ AI Workflows processes form submissions through AI models and saves structured o
 ## Architecture
 
 ```
-Form POST → /_aiwf/:id
-    ↓
-Serverless Function (validates, queues run)
-    ↓
-Background Function (calls AI Gateway, saves output)
-    ↓
-Netlify Blobs (stores runs and results)
+User Site                              Extension Site
+┌─────────────────────────┐           ┌─────────────────────────────┐
+│ Form POST → /_aiwf/:id  │           │ Blob Store: aiwf-configs    │
+│         ↓               │    GET    │   Keys: {siteId}:{id}       │
+│ Injected Function ──────┼──────────→│                             │
+│         ↓               │           │ /.netlify/functions/        │
+│ Netlify Forms (optional)│           │   get-workflow              │
+│         ↓               │           └─────────────────────────────┘
+│ Background Function     │
+│         ↓               │
+│ AI Gateway              │
+│         ↓               │
+│ Blob Store: aiwf-runs   │
+└─────────────────────────┘
 ```
+
+Workflow configs are stored on the extension's site and fetched via API. This allows the extension UI to manage configs while injected functions on user sites can access them.
 
 ## Features
 
 - **Multiple AI Providers**: Anthropic (Claude), OpenAI (GPT), Google (Gemini) via Netlify AI Gateway
 - **Structured Output**: Define the exact JSON schema you want returned
+- **Netlify Forms Integration**: Optionally submit to Netlify Forms as backup
 - **Run History**: Track all submissions and their processing status
 - **Manual Retry**: Retry failed runs with one click
 - **No Code Required**: Configure everything through the UI
@@ -69,14 +79,17 @@ This extension uses Netlify SDK v2. Key requirements:
 
 See `CLAUDE.md` for detailed technical requirements.
 
-### Testing Locally
+### Testing
 
-1. Deploy and publish extension as private to your team (one-time)
+1. Deploy and publish extension as private to your team
 2. Create a test project and install the extension
-3. Run `netlify dev` in the test project to inject functions
-4. Submit forms to `http://localhost:8888/_aiwf/{workflow-id}`
+3. Configure a workflow in the extension UI
+4. **Important**: Redeploy the test site after extension updates to get new injected functions
+5. Submit forms to `/_aiwf/{workflow-id}`
 
 ## Form Integration
+
+### Basic Form
 
 ```html
 <form action="/_aiwf/your-workflow-id" method="POST">
@@ -87,15 +100,29 @@ See `CLAUDE.md` for detailed technical requirements.
 </form>
 ```
 
+### With Netlify Forms Backup
+
+To also capture submissions in Netlify Forms:
+
+1. Add `name` and `data-netlify="true"` to your form for Netlify detection
+2. Set the `formName` field in your workflow config to match the form name
+3. The extension will submit to Netlify Forms before AI processing
+
+```html
+<form name="contact" data-netlify="true" action="/_aiwf/your-workflow-id" method="POST">
+  <!-- form fields -->
+</form>
+```
+
 ## Accessing Output Data
 
-Workflow outputs are stored in Netlify Blobs:
+Workflow outputs are stored in Netlify Blobs on the user's site:
 
 ```javascript
 import { getStore } from '@netlify/blobs';
 
 // Get all runs for a workflow
-const store = getStore('aiwf-runs-{workflow-id}');
+const store = getStore(`aiwf-runs-${workflowId}`);
 const { blobs } = await store.list();
 
 for (const blob of blobs) {
@@ -110,10 +137,11 @@ for (const blob of blobs) {
 src/
 ├── index.ts                 # Extension entry, function injection
 ├── functions/
-│   ├── workflow-handler.ts  # Form submission handler (/_aiwf/:id)
-│   └── process-workflow-background.ts  # AI processing
+│   ├── workflow-handler.ts  # Injected: form handler (/_aiwf/:id)
+│   └── process-workflow-background.ts  # Injected: AI processing
 ├── endpoints/
-│   └── trpc.ts              # tRPC API endpoint
+│   ├── trpc.ts              # tRPC API endpoint
+│   └── get-workflow.ts      # Public API for fetching workflow configs
 ├── server/
 │   ├── trpc.ts              # tRPC setup
 │   └── router.ts            # API procedures
@@ -130,6 +158,17 @@ src/
     ├── blob-stores.ts       # Netlify Blobs helpers
     └── ai-client.ts         # AI Gateway client
 ```
+
+## Environment Variables
+
+### On User Sites (Auto-provided)
+
+- `SITE_ID` - Used to scope workflow configs
+- `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY` - Provided by AI Gateway
+
+### Optional Override
+
+- `AIWF_EXTENSION_URL` - Override extension URL (default: `https://ai-workflows.netlify.app`)
 
 ## License
 
