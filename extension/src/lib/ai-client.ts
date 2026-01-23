@@ -45,8 +45,17 @@ ${interpolatedPrompt}`;
     throw new Error(`Unsupported provider: ${config.provider}`);
   }
 
+  // Strip markdown code fences if present
+  let content = response.content.trim();
+  if (content.startsWith('```')) {
+    // Remove opening fence (```json or ```)
+    content = content.replace(/^```(?:json)?\s*\n?/, '');
+    // Remove closing fence
+    content = content.replace(/\n?```\s*$/, '');
+  }
+
   try {
-    return JSON.parse(response.content);
+    return JSON.parse(content);
   } catch {
     throw new Error(`Failed to parse AI response as JSON: ${response.content}`);
   }

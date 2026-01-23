@@ -21,6 +21,39 @@ async function fetchWorkflowConfig(workflowId: string, siteId: string): Promise<
   }
 }
 
+// Submit form data to Netlify Forms
+async function submitToNetlifyForms(
+  baseUrl: string,
+  formName: string,
+  formData: Record<string, unknown>
+): Promise<void> {
+  try {
+    const body = new URLSearchParams();
+    body.append('form-name', formName);
+    for (const [key, value] of Object.entries(formData)) {
+      if (value !== null && value !== undefined) {
+        body.append(key, String(value));
+      }
+    }
+
+    const response = await fetch(baseUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: body.toString(),
+    });
+
+    if (!response.ok) {
+      console.error('Failed to submit to Netlify Forms:', response.status);
+    } else {
+      console.log('Form submitted to Netlify Forms successfully');
+    }
+  } catch (error) {
+    console.error('Error submitting to Netlify Forms:', error);
+  }
+}
+
 export default async function handler(req: Request, context: Context) {
   // Only accept POST requests
   if (req.method !== 'POST') {
@@ -87,6 +120,14 @@ export default async function handler(req: Request, context: Context) {
     });
   }
 
+  const baseUrl = new URL(req.url).origin;
+
+  // Submit to Netlify Forms if formName is configured
+  // This happens first to ensure form data is captured even if AI processing fails
+  if (config.formName) {
+    await submitToNetlifyForms(baseUrl, config.formName, formData);
+  }
+
   // Create run record
   const runId = uuid();
   const run: WorkflowRun = {
@@ -103,7 +144,6 @@ export default async function handler(req: Request, context: Context) {
   await setWorkflowRun(run);
 
   // Trigger background function
-  const baseUrl = new URL(req.url).origin;
   const backgroundUrl = `${baseUrl}/.netlify/functions/aiwf_process-workflow-background`;
 
   try {
