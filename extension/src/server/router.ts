@@ -25,16 +25,24 @@ const workflowInputSchema = z.object({
   redirectUrl: z.string().url().optional().or(z.literal('')),
 });
 
+// Helper to extract blob context from tRPC context
+function getBlobContext(ctx: { siteId: string | null; auth: { netlifyToken: string | null } }) {
+  if (ctx.siteId && ctx.auth.netlifyToken) {
+    return { siteId: ctx.siteId, token: ctx.auth.netlifyToken };
+  }
+  return undefined;
+}
+
 export const appRouter = router({
   // Workflows
   listWorkflows: publicProcedure.query(async ({ ctx }) => {
-    return listWorkflowConfigs(ctx.siteId ?? undefined);
+    return listWorkflowConfigs(getBlobContext(ctx));
   }),
 
   getWorkflow: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      return getWorkflowConfig(input.id, ctx.siteId ?? undefined);
+      return getWorkflowConfig(input.id, getBlobContext(ctx));
     }),
 
   createWorkflow: publicProcedure
@@ -54,14 +62,14 @@ export const appRouter = router({
         createdAt: now,
         updatedAt: now,
       };
-      await setWorkflowConfig(config, ctx.siteId ?? undefined);
+      await setWorkflowConfig(config, getBlobContext(ctx));
       return config;
     }),
 
   updateWorkflow: publicProcedure
     .input(z.object({ id: z.string() }).merge(workflowInputSchema))
     .mutation(async ({ input, ctx }) => {
-      const existing = await getWorkflowConfig(input.id, ctx.siteId ?? undefined);
+      const existing = await getWorkflowConfig(input.id, getBlobContext(ctx));
       if (!existing) {
         throw new Error('Workflow not found');
       }
@@ -77,14 +85,14 @@ export const appRouter = router({
         redirectUrl: input.redirectUrl || undefined,
         updatedAt: new Date().toISOString(),
       };
-      await setWorkflowConfig(config, ctx.siteId ?? undefined);
+      await setWorkflowConfig(config, getBlobContext(ctx));
       return config;
     }),
 
   deleteWorkflow: publicProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      await deleteWorkflowConfig(input.id, ctx.siteId ?? undefined);
+      await deleteWorkflowConfig(input.id, getBlobContext(ctx));
       return { success: true };
     }),
 
@@ -95,19 +103,19 @@ export const appRouter = router({
       status: z.enum(['queued', 'processing', 'success', 'error']).optional(),
     }))
     .query(async ({ input, ctx }) => {
-      return listWorkflowRuns(input.workflowId, input.status, ctx.siteId ?? undefined);
+      return listWorkflowRuns(input.workflowId, input.status, getBlobContext(ctx));
     }),
 
   getRun: publicProcedure
     .input(z.object({ workflowId: z.string(), runId: z.string() }))
     .query(async ({ input, ctx }) => {
-      return getWorkflowRun(input.workflowId, input.runId, ctx.siteId ?? undefined);
+      return getWorkflowRun(input.workflowId, input.runId, getBlobContext(ctx));
     }),
 
   retryRun: publicProcedure
     .input(z.object({ workflowId: z.string(), runId: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const originalRun = await getWorkflowRun(input.workflowId, input.runId, ctx.siteId ?? undefined);
+      const originalRun = await getWorkflowRun(input.workflowId, input.runId, getBlobContext(ctx));
       if (!originalRun) {
         throw new Error('Run not found');
       }
@@ -124,7 +132,7 @@ export const appRouter = router({
         retryCount: originalRun.retryCount + 1,
       };
 
-      await setWorkflowRun(newRun, ctx.siteId ?? undefined);
+      await setWorkflowRun(newRun, getBlobContext(ctx));
 
       // Trigger background function
       // Note: In the actual extension context, we need to get the site URL
