@@ -2,6 +2,7 @@ import { getStore } from '@netlify/blobs';
 import type { WorkflowConfig, WorkflowRun } from './types.js';
 
 const CONFIGS_STORE = 'aiwf-configs';
+const RUNS_STORE = 'aiwf-runs';
 
 // Store blobs on the extension's site, namespaced by siteId in the key
 // This is used by the extension UI (tRPC endpoints)
@@ -9,13 +10,24 @@ export function getConfigsStore() {
   return getStore(CONFIGS_STORE);
 }
 
-export function getRunsStore(workflowId: string) {
-  return getStore(`aiwf-runs-${workflowId}`);
+export function getRunsStore() {
+  return getStore(RUNS_STORE);
 }
 
 // Create site-namespaced keys
 function siteKey(siteId: string | undefined, key: string): string {
   return siteId ? `${siteId}:${key}` : key;
+}
+
+// Create composite key for runs: {siteId}:{workflowId}:{runId}
+function runKey(siteId: string | undefined, workflowId: string, runId: string): string {
+  const prefix = siteId ? `${siteId}:${workflowId}` : workflowId;
+  return `${prefix}:${runId}`;
+}
+
+// Create prefix for listing runs by workflow
+function runPrefix(siteId: string | undefined, workflowId: string): string {
+  return siteId ? `${siteId}:${workflowId}:` : `${workflowId}:`;
 }
 
 export async function getWorkflowConfig(id: string, siteId?: string): Promise<WorkflowConfig | null> {
@@ -56,13 +68,13 @@ export async function listWorkflowConfigs(siteId?: string): Promise<WorkflowConf
 }
 
 export async function getWorkflowRun(workflowId: string, runId: string, siteId?: string): Promise<WorkflowRun | null> {
-  const store = getRunsStore(siteKey(siteId, workflowId));
-  return store.get(runId, { type: 'json' });
+  const store = getRunsStore();
+  return store.get(runKey(siteId, workflowId, runId), { type: 'json' });
 }
 
 export async function setWorkflowRun(run: WorkflowRun, siteId?: string): Promise<void> {
-  const store = getRunsStore(siteKey(siteId, run.workflowId));
-  await store.setJSON(run.id, run);
+  const store = getRunsStore();
+  await store.setJSON(runKey(siteId, run.workflowId, run.id), run);
 }
 
 export async function listWorkflowRuns(
@@ -70,8 +82,9 @@ export async function listWorkflowRuns(
   status?: WorkflowRun['status'],
   siteId?: string
 ): Promise<WorkflowRun[]> {
-  const store = getRunsStore(siteKey(siteId, workflowId));
-  const { blobs } = await store.list();
+  const store = getRunsStore();
+  const prefix = runPrefix(siteId, workflowId);
+  const { blobs } = await store.list({ prefix });
   const runs: WorkflowRun[] = [];
 
   for (const blob of blobs) {
