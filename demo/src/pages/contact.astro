@@ -1,0 +1,247 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Contact Us" description="Get in touch with Hearth & Hand Crafts. We'd love to hear from you!">
+  <!-- Page Header -->
+  <section class="relative overflow-hidden py-16 md:py-24">
+    <!-- Decorative background -->
+    <div class="absolute inset-0">
+      <div class="absolute top-0 left-1/4 w-64 h-64 bg-terracotta/5 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-sage/5 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-6 relative z-10">
+      <div class="text-center mb-8">
+        <span class="animate-fade-in inline-block font-[family-name:var(--font-accent)] text-terracotta text-2xl mb-2">
+          Let's Chat
+        </span>
+        <h1 class="animate-fade-in-up delay-100 font-[family-name:var(--font-display)] text-5xl md:text-6xl font-bold text-charcoal leading-tight">
+          Get in Touch
+        </h1>
+        <p class="animate-fade-in-up delay-200 text-charcoal-light text-lg mt-4 max-w-2xl mx-auto">
+          Have a question about a product? Looking for a custom piece? Or just want to say hello? We're all ears and would love to hear from you.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Form Section -->
+  <section class="pb-20 md:pb-32">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid lg:grid-cols-5 gap-12 lg:gap-16">
+        <!-- Left Column - Contact Info -->
+        <div class="lg:col-span-2 animate-fade-in-up delay-300">
+          <div class="sticky top-8">
+            <!-- Decorative illustration -->
+            <div class="mb-8 relative">
+              <div class="w-full aspect-square max-w-xs bg-gradient-to-br from-cream-dark to-kraft rounded-2xl p-8 relative overflow-hidden">
+                <!-- Envelope illustration -->
+                <svg class="w-full h-full" viewBox="0 0 100 100" fill="none">
+                  <!-- Letter/envelope -->
+                  <rect x="15" y="25" width="70" height="50" rx="4" fill="#fffcf7" stroke="#d4c4a8" stroke-width="2"/>
+                  <path d="M15 29 L50 55 L85 29" stroke="#c1666b" stroke-width="2" fill="none" stroke-linecap="round"/>
+                  <path d="M15 75 L35 55 M85 75 L65 55" stroke="#d4c4a8" stroke-width="2" stroke-linecap="round"/>
+
+                  <!-- Paper coming out -->
+                  <rect x="25" y="10" width="50" height="35" rx="2" fill="#faf6f1" stroke="#d4c4a8" stroke-width="1.5"/>
+                  <line x1="32" y1="20" x2="68" y2="20" stroke="#c1666b" stroke-width="2" stroke-linecap="round"/>
+                  <line x1="32" y1="28" x2="58" y2="28" stroke="#d4c4a8" stroke-width="1.5" stroke-linecap="round"/>
+                  <line x1="32" y1="35" x2="52" y2="35" stroke="#d4c4a8" stroke-width="1.5" stroke-linecap="round"/>
+
+                  <!-- Heart seal -->
+                  <circle cx="75" cy="65" r="10" fill="#c1666b"/>
+                  <path d="M71 64 Q71 61 73 61 Q75 61 75 63 Q75 61 77 61 Q79 61 79 64 Q79 66 75 69 Q71 66 71 64" fill="#fffcf7"/>
+                </svg>
+
+                <!-- Decorative elements -->
+                <div class="absolute top-4 right-4 animate-float">
+                  <svg class="w-6 h-6 text-sage" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Decorative frame -->
+              <div class="absolute -inset-3 border-2 border-kraft rounded-2xl -z-10 transform rotate-2"></div>
+            </div>
+
+            <!-- Contact Details -->
+            <div class="space-y-6">
+              <div>
+                <h3 class="font-[family-name:var(--font-display)] text-xl font-semibold text-charcoal mb-4">
+                  Other Ways to Reach Us
+                </h3>
+              </div>
+
+              <div class="flex items-start gap-4 group">
+                <div class="w-12 h-12 rounded-full bg-terracotta/10 flex items-center justify-center flex-shrink-0 group-hover:bg-terracotta/20 transition-colors">
+                  <svg class="w-5 h-5 text-terracotta" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+                <div>
+                  <span class="block text-sm text-charcoal-light mb-1">Email Us</span>
+                  <span class="text-charcoal font-medium">hello@hearthandhand.craft</span>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-4 group">
+                <div class="w-12 h-12 rounded-full bg-sage/20 flex items-center justify-center flex-shrink-0 group-hover:bg-sage/30 transition-colors">
+                  <svg class="w-5 h-5 text-sage-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                </div>
+                <div>
+                  <span class="block text-sm text-charcoal-light mb-1">Visit Our Studio</span>
+                  <span class="text-charcoal font-medium">Portland, Oregon</span>
+                  <span class="block text-sm text-charcoal-light mt-1">By appointment only</span>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-4 group">
+                <div class="w-12 h-12 rounded-full bg-kraft/50 flex items-center justify-center flex-shrink-0 group-hover:bg-kraft/70 transition-colors">
+                  <svg class="w-5 h-5 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <div>
+                  <span class="block text-sm text-charcoal-light mb-1">Response Time</span>
+                  <span class="text-charcoal font-medium">Within 24-48 hours</span>
+                  <span class="block text-sm text-charcoal-light mt-1">Usually much faster!</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Testimonial -->
+            <div class="mt-10 p-6 bg-warm-white rounded-xl border-2 border-kraft/50">
+              <svg class="w-8 h-8 text-terracotta/30 mb-3" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+              </svg>
+              <p class="text-charcoal-light italic leading-relaxed">
+                "The team at Hearth & Hand went above and beyond to create a custom piece for my mother's birthday. Their communication was wonderful throughout!"
+              </p>
+              <div class="mt-4 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-sage/20 flex items-center justify-center">
+                  <span class="font-[family-name:var(--font-accent)] text-sage-dark text-lg">M</span>
+                </div>
+                <div>
+                  <span class="block text-sm font-medium text-charcoal">Maria S.</span>
+                  <span class="text-xs text-charcoal-light">Happy Customer</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column - Form -->
+        <div class="lg:col-span-3 animate-fade-in-up delay-400">
+          <div class="bg-warm-white rounded-2xl p-8 md:p-10 shadow-sm border border-kraft/30">
+            <div class="mb-8">
+              <h2 class="font-[family-name:var(--font-display)] text-2xl font-semibold text-charcoal mb-2">
+                Send Us a Message
+              </h2>
+              <p class="text-charcoal-light">
+                Fill out the form below and we'll get back to you as soon as possible.
+              </p>
+            </div>
+
+            <form action="/_aiwf/776022e9-d250-481f-ae30-fa0d229d4b3b" method="POST" class="space-y-6">
+              <!-- Name Field -->
+              <div>
+                <label for="name" class="form-label">
+                  Your Name <span class="text-terracotta">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  placeholder="What should we call you?"
+                  class="form-input"
+                />
+              </div>
+
+              <!-- Email Field -->
+              <div>
+                <label for="email" class="form-label">
+                  Email Address <span class="text-terracotta">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  placeholder="your@email.com"
+                  class="form-input"
+                />
+              </div>
+
+              <!-- Subject Field -->
+              <div>
+                <label for="subject" class="form-label">
+                  Subject <span class="text-terracotta">*</span>
+                </label>
+                <select
+                  id="subject"
+                  name="subject"
+                  required
+                  class="form-input cursor-pointer"
+                >
+                  <option value="" disabled selected>What's this about?</option>
+                  <option value="General Inquiry">General Inquiry</option>
+                  <option value="Custom Order">Custom Order Request</option>
+                  <option value="Product Question">Product Question</option>
+                  <option value="Wholesale">Wholesale Inquiry</option>
+                  <option value="Collaboration">Artisan Collaboration</option>
+                  <option value="Other">Something Else</option>
+                </select>
+              </div>
+
+              <!-- Message Field -->
+              <div>
+                <label for="message" class="form-label">
+                  Your Message <span class="text-terracotta">*</span>
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  required
+                  rows="5"
+                  placeholder="Tell us what's on your mind..."
+                  class="form-input resize-none"
+                ></textarea>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="pt-4">
+                <button
+                  type="submit"
+                  class="btn-primary w-full md:w-auto flex items-center justify-center gap-2 text-lg group"
+                >
+                  <span>Send Message</span>
+                  <svg class="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Privacy Note -->
+              <p class="text-xs text-charcoal-light mt-4">
+                By submitting this form, you agree to our privacy policy. We'll never share your information with third parties.
+              </p>
+            </form>
+          </div>
+
+          <!-- Additional Help -->
+          <div class="mt-8 text-center">
+            <p class="font-[family-name:var(--font-accent)] text-xl text-charcoal-light">
+              "We read every message personally — no bots here!"
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,17 +1,280 @@
 ---
-
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title="Home">
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden">
+    <!-- Background pattern -->
+    <div class="absolute inset-0 opacity-5">
+      <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <pattern id="hero-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+          <circle cx="10" cy="10" r="1" fill="currentColor" class="text-charcoal"/>
+        </pattern>
+        <rect width="100%" height="100%" fill="url(#hero-pattern)"/>
+      </svg>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-6 py-24 md:py-32">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <!-- Hero Text -->
+        <div class="relative z-10">
+          <span class="animate-fade-in-up inline-block font-[family-name:var(--font-accent)] text-terracotta text-2xl mb-4">
+            Handcrafted with love
+          </span>
+          <h1 class="animate-fade-in-up delay-100 font-[family-name:var(--font-display)] text-5xl md:text-6xl lg:text-7xl font-bold text-charcoal leading-[1.1] mb-6">
+            Treasures Made
+            <span class="block italic text-terracotta">by Hand</span>
+          </h1>
+          <p class="animate-fade-in-up delay-200 text-lg text-charcoal-light leading-relaxed mb-8 max-w-lg">
+            Each piece in our collection is lovingly crafted by local artisans who pour their heart and soul into every creation. No two items are exactly alike — just like you.
+          </p>
+          <div class="animate-fade-in-up delay-300 flex flex-wrap gap-4">
+            <a href="/contact" class="btn-primary">
+              Get in Touch
+            </a>
+            <a href="#featured" class="btn-secondary">
+              Explore Crafts
+            </a>
+          </div>
+        </div>
+
+        <!-- Hero Image/Illustration -->
+        <div class="relative animate-fade-in delay-400">
+          <div class="relative">
+            <!-- Decorative frame -->
+            <div class="absolute -inset-4 border-2 border-kraft rounded-3xl transform rotate-3"></div>
+            <div class="absolute -inset-4 border-2 border-terracotta/30 rounded-3xl transform -rotate-2"></div>
+
+            <!-- Main image container -->
+            <div class="relative bg-gradient-to-br from-cream-dark to-kraft rounded-2xl aspect-square overflow-hidden">
+              <!-- Decorative crafts illustration -->
+              <svg class="absolute inset-0 w-full h-full p-8" viewBox="0 0 200 200" fill="none">
+                <!-- Yarn ball -->
+                <circle cx="60" cy="70" r="35" fill="#c1666b" opacity="0.9"/>
+                <path d="M40 55 Q60 40 80 55 Q95 70 80 85 Q60 100 40 85 Q25 70 40 55" stroke="#a3545a" stroke-width="2" fill="none"/>
+                <path d="M45 60 Q60 50 75 60" stroke="#a3545a" stroke-width="1.5" fill="none"/>
+                <path d="M45 80 Q60 90 75 80" stroke="#a3545a" stroke-width="1.5" fill="none"/>
+
+                <!-- Ceramic pot -->
+                <path d="M120 180 L115 120 Q115 110 130 110 L150 110 Q165 110 165 120 L160 180 Q160 185 140 185 Q120 185 120 180" fill="#7d8c6e"/>
+                <ellipse cx="140" cy="110" rx="25" ry="8" fill="#5f6b52"/>
+                <path d="M125 140 Q140 145 155 140" stroke="#5f6b52" stroke-width="2" fill="none"/>
+
+                <!-- Woven basket -->
+                <path d="M30 130 Q30 180 70 180 Q110 180 110 130" fill="#d4c4a8"/>
+                <path d="M30 130 Q70 120 110 130" fill="#c4b498"/>
+                <path d="M35 145 L105 145 M35 160 L105 160 M35 175 L105 175" stroke="#b5a589" stroke-width="2"/>
+                <path d="M50 130 L50 180 M70 130 L70 180 M90 130 L90 180" stroke="#b5a589" stroke-width="2"/>
+
+                <!-- Knitting needles -->
+                <line x1="150" y1="30" x2="180" y2="90" stroke="#3d3835" stroke-width="3" stroke-linecap="round"/>
+                <line x1="160" y1="25" x2="190" y2="85" stroke="#3d3835" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="150" cy="30" r="5" fill="#c1666b"/>
+                <circle cx="160" cy="25" r="5" fill="#c1666b"/>
+
+                <!-- Thread spool -->
+                <rect x="100" y="40" width="30" height="40" rx="3" fill="#faf6f1" stroke="#d4c4a8" stroke-width="2"/>
+                <rect x="95" y="38" width="40" height="6" rx="2" fill="#d4c4a8"/>
+                <rect x="95" y="76" width="40" height="6" rx="2" fill="#d4c4a8"/>
+                <path d="M105 50 L125 50 M105 58 L125 58 M105 66 L125 66" stroke="#c1666b" stroke-width="2"/>
+              </svg>
+
+              <!-- Floating elements -->
+              <div class="absolute top-4 right-4 animate-float">
+                <svg class="w-8 h-8 text-terracotta" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values Section -->
+  <section class="py-20 bg-warm-white">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <span class="flourish"></span>
+        <span class="font-[family-name:var(--font-accent)] text-terracotta text-xl">Why Choose Us</span>
+        <span class="flourish"></span>
+        <h2 class="font-[family-name:var(--font-display)] text-4xl md:text-5xl font-bold text-charcoal mt-4">
+          Crafted with Purpose
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Value 1 -->
+        <div class="text-center p-8 group">
+          <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-terracotta/10 flex items-center justify-center group-hover:bg-terracotta/20 transition-colors">
+            <svg class="w-10 h-10 text-terracotta" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+          </div>
+          <h3 class="font-[family-name:var(--font-display)] text-xl font-semibold text-charcoal mb-3">Made with Love</h3>
+          <p class="text-charcoal-light leading-relaxed">
+            Every item is handcrafted by artisans who genuinely care about their work and your satisfaction.
+          </p>
+        </div>
+
+        <!-- Value 2 -->
+        <div class="text-center p-8 group">
+          <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-sage/20 flex items-center justify-center group-hover:bg-sage/30 transition-colors">
+            <svg class="w-10 h-10 text-sage-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+          </div>
+          <h3 class="font-[family-name:var(--font-display)] text-xl font-semibold text-charcoal mb-3">One of a Kind</h3>
+          <p class="text-charcoal-light leading-relaxed">
+            No two pieces are exactly alike. Each creation has its own unique character and story to tell.
+          </p>
+        </div>
+
+        <!-- Value 3 -->
+        <div class="text-center p-8 group">
+          <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-kraft/50 flex items-center justify-center group-hover:bg-kraft/70 transition-colors">
+            <svg class="w-10 h-10 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+          </div>
+          <h3 class="font-[family-name:var(--font-display)] text-xl font-semibold text-charcoal mb-3">Local Artisans</h3>
+          <p class="text-charcoal-light leading-relaxed">
+            We partner with talented craftspeople from our community, supporting local makers and traditions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Crafts Section -->
+  <section id="featured" class="py-20">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <span class="font-[family-name:var(--font-accent)] text-terracotta text-xl">Our Collection</span>
+        <h2 class="font-[family-name:var(--font-display)] text-4xl md:text-5xl font-bold text-charcoal mt-2 mb-4">
+          Featured Crafts
+        </h2>
+        <p class="text-charcoal-light max-w-2xl mx-auto">
+          A glimpse into the beautiful handmade treasures waiting to find their forever homes.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Craft Card 1 -->
+        <article class="craft-card">
+          <div class="aspect-[4/3] bg-gradient-to-br from-terracotta/20 to-terracotta/5 relative overflow-hidden">
+            <svg class="absolute inset-0 w-full h-full p-6" viewBox="0 0 100 75" fill="none">
+              <rect x="20" y="15" width="60" height="50" rx="3" fill="#c1666b" opacity="0.8"/>
+              <rect x="25" y="20" width="50" height="40" fill="#faf6f1"/>
+              <path d="M30 35 L45 50 L70 25" stroke="#7d8c6e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="40" cy="30" r="5" fill="#d4c4a8"/>
+            </svg>
+            <span class="absolute top-4 left-4 bg-terracotta text-warm-white text-xs px-3 py-1 rounded-full font-medium">
+              Popular
+            </span>
+          </div>
+          <div class="p-6">
+            <span class="text-xs text-charcoal-light uppercase tracking-wider">Textiles</span>
+            <h3 class="font-[family-name:var(--font-display)] text-xl font-semibold text-charcoal mt-1 mb-2">
+              Hand-Woven Wall Hanging
+            </h3>
+            <p class="text-charcoal-light text-sm mb-4">
+              Bohemian-inspired macramé piece with natural cotton and wooden beads.
+            </p>
+            <div class="flex items-center justify-between">
+              <span class="font-[family-name:var(--font-display)] text-lg font-semibold text-terracotta">$68</span>
+              <span class="font-[family-name:var(--font-accent)] text-charcoal-light">by Sarah M.</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Craft Card 2 -->
+        <article class="craft-card">
+          <div class="aspect-[4/3] bg-gradient-to-br from-sage/20 to-sage/5 relative overflow-hidden">
+            <svg class="absolute inset-0 w-full h-full p-6" viewBox="0 0 100 75" fill="none">
+              <ellipse cx="50" cy="55" rx="25" ry="8" fill="#5f6b52"/>
+              <path d="M25 55 L25 30 Q25 15 50 15 Q75 15 75 30 L75 55" fill="#7d8c6e"/>
+              <ellipse cx="50" cy="30" rx="25" ry="8" fill="#8fa07d"/>
+              <path d="M35 40 Q50 45 65 40" stroke="#5f6b52" stroke-width="2" fill="none"/>
+            </svg>
+            <span class="absolute top-4 left-4 bg-sage text-warm-white text-xs px-3 py-1 rounded-full font-medium">
+              New
+            </span>
+          </div>
+          <div class="p-6">
+            <span class="text-xs text-charcoal-light uppercase tracking-wider">Ceramics</span>
+            <h3 class="font-[family-name:var(--font-display)] text-xl font-semibold text-charcoal mt-1 mb-2">
+              Glazed Herb Planter
+            </h3>
+            <p class="text-charcoal-light text-sm mb-4">
+              Hand-thrown stoneware pot with drainage hole. Perfect for your kitchen windowsill.
+            </p>
+            <div class="flex items-center justify-between">
+              <span class="font-[family-name:var(--font-display)] text-lg font-semibold text-terracotta">$42</span>
+              <span class="font-[family-name:var(--font-accent)] text-charcoal-light">by James L.</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Craft Card 3 -->
+        <article class="craft-card">
+          <div class="aspect-[4/3] bg-gradient-to-br from-kraft/40 to-kraft/10 relative overflow-hidden">
+            <svg class="absolute inset-0 w-full h-full p-6" viewBox="0 0 100 75" fill="none">
+              <rect x="30" y="20" width="40" height="45" rx="2" fill="#d4c4a8"/>
+              <rect x="30" y="20" width="40" height="8" fill="#c4b498"/>
+              <line x1="35" y1="35" x2="65" y2="35" stroke="#b5a589" stroke-width="2"/>
+              <line x1="35" y1="42" x2="55" y2="42" stroke="#b5a589" stroke-width="2"/>
+              <line x1="35" y1="49" x2="60" y2="49" stroke="#b5a589" stroke-width="2"/>
+              <line x1="35" y1="56" x2="50" y2="56" stroke="#b5a589" stroke-width="2"/>
+              <circle cx="60" cy="55" r="8" fill="#c1666b" opacity="0.8"/>
+            </svg>
+          </div>
+          <div class="p-6">
+            <span class="text-xs text-charcoal-light uppercase tracking-wider">Paper Goods</span>
+            <h3 class="font-[family-name:var(--font-display)] text-xl font-semibold text-charcoal mt-1 mb-2">
+              Leather-Bound Journal
+            </h3>
+            <p class="text-charcoal-light text-sm mb-4">
+              Hand-stitched with recycled cotton pages. Includes wax seal and ribbon bookmark.
+            </p>
+            <div class="flex items-center justify-between">
+              <span class="font-[family-name:var(--font-display)] text-lg font-semibold text-terracotta">$35</span>
+              <span class="font-[family-name:var(--font-accent)] text-charcoal-light">by Emma K.</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-charcoal relative overflow-hidden">
+    <!-- Decorative pattern -->
+    <div class="absolute inset-0 opacity-5">
+      <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <pattern id="cta-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M20 0 L40 20 L20 40 L0 20 Z" fill="none" stroke="currentColor" class="text-cream" stroke-width="0.5"/>
+        </pattern>
+        <rect width="100%" height="100%" fill="url(#cta-pattern)"/>
+      </svg>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-6 text-center relative z-10">
+      <span class="font-[family-name:var(--font-accent)] text-terracotta text-2xl">Have Questions?</span>
+      <h2 class="font-[family-name:var(--font-display)] text-4xl md:text-5xl font-bold text-cream mt-4 mb-6">
+        We'd Love to Hear from You
+      </h2>
+      <p class="text-cream/70 text-lg mb-8 max-w-2xl mx-auto">
+        Whether you're looking for a custom piece, have questions about our artisans, or just want to say hello — we're here for you.
+      </p>
+      <a href="/contact" class="btn-primary inline-flex items-center gap-2 text-lg">
+        Send Us a Message
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </a>
+    </div>
+  </section>
+</BaseLayout>
