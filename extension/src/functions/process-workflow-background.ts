@@ -141,8 +141,11 @@ export default async function handler(req: Request, _context: Context) {
     // Execute actions if configured
     let actionResults;
     if (config.actions?.length) {
+      console.log(`Run ${runId}: found ${config.actions.length} action(s), executing...`);
       actionResults = await executeActions(config.actions, run.input, output, siteId);
       console.log(`Run ${runId} action results:`, JSON.stringify(actionResults));
+    } else {
+      console.log(`Run ${runId}: no actions configured (config.actions = ${JSON.stringify(config.actions)})`);
     }
 
     // Update run with success
