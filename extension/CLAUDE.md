@@ -58,7 +58,8 @@ Extension Site (ai-workflows.netlify.app)
     ├── /.netlify/functions/get-workflow  (injected functions fetch config)
     ├── /.netlify/functions/get-run  (injected functions fetch run)
     ├── /.netlify/functions/create-run  (injected functions create run)
-    └── /.netlify/functions/update-run  (injected functions update run status)
+    ├── /.netlify/functions/update-run  (injected functions update run status)
+    └── /.netlify/functions/create-agent-runner  (proxy to Netlify Agent Runners API)
 
 User Site (where extension is installed)
 ├── Injected Functions:
@@ -74,6 +75,7 @@ User Site (where extension is installed)
 3. If `formName` configured → form data submitted to Netlify Forms first
 4. Run record created on extension site via `create-run` endpoint → background function triggered
 5. Background function calls AI Gateway → result saved to extension site via `update-run` endpoint
+6. If actions configured → conditions evaluated against AI output → matching actions trigger agent runners via `create-agent-runner` proxy endpoint → action results stored on run record
 
 ### Function Injection
 
@@ -87,6 +89,7 @@ GET  /.netlify/functions/get-workflow?siteId={SITE_ID}&workflowId={id}
 GET  /.netlify/functions/get-run?siteId={SITE_ID}&workflowId={id}&runId={runId}
 POST /.netlify/functions/create-run  (body: { siteId, run })
 POST /.netlify/functions/update-run  (body: { siteId, workflowId, runId, updates })
+POST /.netlify/functions/create-agent-runner  (body: { siteId, prompt })
 ```
 
 The extension URL can be overridden with `AIWF_EXTENSION_URL` env var.
@@ -94,6 +97,12 @@ The extension URL can be overridden with `AIWF_EXTENSION_URL` env var.
 ### AI Gateway
 
 The extension uses Netlify AI Gateway which auto-provides API keys (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`) in function environments. The `src/lib/ai-client.ts` handles provider-specific API calls.
+
+### Actions (Agent Runners)
+
+Workflows can optionally define actions that trigger Netlify Agent Runners based on AI output. After AI processing, each action's condition is evaluated against the output. Matching actions have their prompt templates interpolated with input/output data and sent to the Agent Runners API via the `create-agent-runner` proxy endpoint.
+
+The proxy endpoint requires `NETLIFY_API_TOKEN` set as an env var on the extension site. This token authenticates requests to `POST /api/v1/agent_runners?site_id=X`.
 
 AI responses are parsed as JSON. Markdown code fences (```json) are automatically stripped before parsing.
 
@@ -110,8 +119,11 @@ AI responses are parsed as JSON. Markdown code fences (```json) are automaticall
 | `src/endpoints/get-run.ts` | Public API for injected functions to fetch run |
 | `src/endpoints/create-run.ts` | Public API for injected functions to create run |
 | `src/endpoints/update-run.ts` | Public API for injected functions to update run |
+| `src/endpoints/create-agent-runner.ts` | Proxy to Netlify Agent Runners API (requires `NETLIFY_API_TOKEN`) |
+| `src/lib/actions.ts` | Action evaluation, prompt interpolation, and execution |
 | `src/functions/workflow-handler.ts` | Injected: handles form submissions |
-| `src/functions/process-workflow-background.ts` | Injected: processes AI calls |
+| `src/functions/process-workflow-background.ts` | Injected: processes AI calls + triggers actions |
+| `src/ui/components/ActionsEditor.tsx` | UI for configuring workflow actions |
 | `src/ui/surfaces/SiteConfiguration.tsx` | Main UI component |
 
 ## Testing

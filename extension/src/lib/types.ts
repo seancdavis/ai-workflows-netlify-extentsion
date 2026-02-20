@@ -7,6 +7,30 @@ export interface JSONSchema {
   description?: string;
 }
 
+export type ActionConditionOperator = 'always' | 'equals' | 'contains';
+
+export interface ActionCondition {
+  field: string;
+  operator: ActionConditionOperator;
+  value?: string;
+}
+
+export interface WorkflowAction {
+  id: string;
+  name: string;
+  type: 'agent_runner';
+  condition: ActionCondition;
+  promptTemplate: string;
+}
+
+export interface ActionResult {
+  actionId: string;
+  actionName: string;
+  status: 'triggered' | 'skipped' | 'error';
+  agentRunnerId?: string;
+  error?: string;
+}
+
 export interface WorkflowConfig {
   id: string;
   name: string;
@@ -17,6 +41,7 @@ export interface WorkflowConfig {
   provider: string;
   model: string;
   redirectUrl?: string;
+  actions?: WorkflowAction[];
   createdAt: string;
   updatedAt: string;
 }
@@ -28,6 +53,7 @@ export interface WorkflowRun {
   input: Record<string, unknown>;
   output?: Record<string, unknown>;
   error?: string;
+  actionResults?: ActionResult[];
   provider: string;
   model: string;
   createdAt: string;

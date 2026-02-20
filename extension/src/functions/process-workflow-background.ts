@@ -1,5 +1,6 @@
 import type { Context } from '@netlify/functions';
 import { callAI } from '../lib/ai-client.js';
+import { executeActions } from '../lib/actions.js';
 import type { WorkflowConfig, WorkflowRun } from '../lib/types.js';
 
 // Extension site URL - this is where workflow configs are stored
@@ -137,10 +138,18 @@ export default async function handler(req: Request, _context: Context) {
     // Call AI
     const output = await callAI(config, run.input);
 
+    // Execute actions if configured
+    let actionResults;
+    if (config.actions?.length) {
+      actionResults = await executeActions(config.actions, run.input, output, siteId);
+      console.log(`Run ${runId} action results:`, JSON.stringify(actionResults));
+    }
+
     // Update run with success
     await updateRunOnExtension(workflowId, runId, {
       status: 'success',
       output,
+      actionResults,
       completedAt: new Date().toISOString(),
     }, siteId);
 

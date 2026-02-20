@@ -14,6 +14,20 @@ import type { WorkflowConfig, WorkflowRun, JSONSchema } from '../lib/types.js';
 
 // Using z.any() for outputSchema as it's a complex recursive type
 // Validated at runtime in the AI client
+const actionConditionSchema = z.object({
+  field: z.string(),
+  operator: z.enum(['always', 'equals', 'contains']),
+  value: z.string().optional(),
+});
+
+const workflowActionSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1),
+  type: z.literal('agent_runner'),
+  condition: actionConditionSchema,
+  promptTemplate: z.string().min(1),
+});
+
 const workflowInputSchema = z.object({
   name: z.string().min(1),
   formName: z.string().optional(),
@@ -23,6 +37,7 @@ const workflowInputSchema = z.object({
   provider: z.string().min(1),
   model: z.string().min(1),
   redirectUrl: z.string().url().optional().or(z.literal('')),
+  actions: z.array(workflowActionSchema).optional(),
 });
 
 export const appRouter = router({
@@ -51,6 +66,7 @@ export const appRouter = router({
         provider: input.provider,
         model: input.model,
         redirectUrl: input.redirectUrl || undefined,
+        actions: input.actions || undefined,
         createdAt: now,
         updatedAt: now,
       };
@@ -75,6 +91,7 @@ export const appRouter = router({
         provider: input.provider,
         model: input.model,
         redirectUrl: input.redirectUrl || undefined,
+        actions: input.actions || undefined,
         updatedAt: new Date().toISOString(),
       };
       await setWorkflowConfig(config, ctx.siteId ?? undefined);

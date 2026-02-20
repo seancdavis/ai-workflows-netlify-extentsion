@@ -201,6 +201,55 @@ export function RunsViewer({ workflow, onBack }: RunsViewerProps) {
             </div>
           )}
 
+          {selectedRun.actionResults && selectedRun.actionResults.length > 0 && (
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{ fontWeight: 500, marginBottom: '0.5rem' }}>Actions:</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {selectedRun.actionResults.map((result) => (
+                  <div
+                    key={result.actionId}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0.5rem 0.75rem',
+                      borderRadius: '4px',
+                      backgroundColor: 'var(--colorBg)',
+                      border: '1px solid var(--colorGrayLighter)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          padding: '0.125rem 0.5rem',
+                          borderRadius: '12px',
+                          fontSize: '0.75rem',
+                          fontWeight: 500,
+                          color: 'white',
+                          backgroundColor:
+                            result.status === 'triggered'
+                              ? 'var(--colorGreenDarker)'
+                              : result.status === 'skipped'
+                                ? 'var(--colorGrayDark)'
+                                : 'var(--colorRedDarker)',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        {result.status}
+                      </span>
+                      <span style={{ fontSize: '0.875rem' }}>{result.actionName}</span>
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--colorTextMuted)' }}>
+                      {result.agentRunnerId && <>Runner: {result.agentRunnerId}</>}
+                      {result.error && <span style={{ color: 'var(--colorRedDarker)' }}>{result.error}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {selectedRun.error && (
             <div style={{ marginBottom: '1rem' }}>
               <div style={{ fontWeight: 500, marginBottom: '0.5rem', color: 'var(--colorRedDarker)' }}>

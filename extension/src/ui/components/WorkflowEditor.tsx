@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Button, Select } from '@netlify/sdk/ui/react/components';
 import { trpc } from '../trpc.js';
-import type { WorkflowConfig, JSONSchema } from '../../lib/types.js';
+import type { WorkflowConfig, JSONSchema, WorkflowAction } from '../../lib/types.js';
+import { ActionsEditor } from './ActionsEditor.js';
 
 interface WorkflowEditorProps {
   workflow: WorkflowConfig | null;
@@ -22,6 +23,8 @@ export function WorkflowEditor({ workflow, onSaved, onCancel }: WorkflowEditorPr
   const [provider, setProvider] = useState(workflow?.provider || 'anthropic');
   const [model, setModel] = useState(workflow?.model || '');
   const [redirectUrl, setRedirectUrl] = useState(workflow?.redirectUrl || '');
+  const [actions, setActions] = useState<WorkflowAction[]>(workflow?.actions || []);
+
   const [outputFields, setOutputFields] = useState<OutputField[]>(() => {
     if (workflow?.outputSchema?.properties) {
       return Object.entries(workflow.outputSchema.properties).map(([fieldName, schema]) => ({
@@ -105,6 +108,7 @@ export function WorkflowEditor({ workflow, onSaved, onCancel }: WorkflowEditorPr
       provider,
       model,
       redirectUrl: redirectUrl || undefined,
+      actions: actions.length > 0 ? actions : undefined,
     };
 
     if (isEditing && workflow) {
@@ -311,6 +315,15 @@ export function WorkflowEditor({ workflow, onSaved, onCancel }: WorkflowEditorPr
         <small style={hintStyle}>
           Where to redirect after form submission. If empty, returns JSON response.
         </small>
+      </div>
+
+      <div style={fieldGroupStyle}>
+        <ActionsEditor
+          actions={actions}
+          onChange={setActions}
+          outputFieldNames={outputFields.filter((f) => f.name.trim()).map((f) => f.name.trim())}
+          inputFieldNames={inputFields.split(',').map((f) => f.trim()).filter(Boolean)}
+        />
       </div>
 
       <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
